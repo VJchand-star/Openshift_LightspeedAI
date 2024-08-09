@@ -29,7 +29,9 @@ sys.path.append(pathlib.Path(__file__).parent.parent.parent.as_posix())
 from ols import config
 
 cfg_file = os.environ.get("OLS_CONFIG_FILE", "olsconfig.yaml")
-config.reload_from_yaml_file(cfg_file, ignore_llm_secrets=True)
+config.reload_from_yaml_file(
+    cfg_file, ignore_llm_secrets=True, ignore_missing_certs=True
+)
 udc_config = config.user_data_collector_config  # shortcut
 
 

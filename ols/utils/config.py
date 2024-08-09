@@ -93,21 +93,28 @@ class AppConfig:
 
     @staticmethod
     def _load_config_from_yaml_stream(
-        stream: TextIOBase, ignore_llm_secrets: bool = False
+        stream: TextIOBase,
+        ignore_llm_secrets: bool = False,
+        ignore_missing_certs: bool = False,
     ) -> config_model.Config:
         """Load configuration from a YAML stream."""
         data = yaml.safe_load(stream)
-        config = config_model.Config(data, ignore_llm_secrets)
+        config = config_model.Config(data, ignore_llm_secrets, ignore_missing_certs)
         config.validate_yaml()
         return config
 
     def reload_from_yaml_file(
-        self, config_file: str, ignore_llm_secrets: bool = False
+        self,
+        config_file: str,
+        ignore_llm_secrets: bool = False,
+        ignore_missing_certs: bool = False,
     ) -> None:
         """Reload the configuration from the YAML file."""
         try:
             with open(config_file, encoding="utf-8") as f:
-                self.config = self._load_config_from_yaml_stream(f, ignore_llm_secrets)
+                self.config = self._load_config_from_yaml_stream(
+                    f, ignore_llm_secrets, ignore_missing_certs
+                )
             # reset the query filters and rag index to not use cached
             # values
             self._query_filters = None

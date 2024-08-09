@@ -182,9 +182,12 @@ class TLSConfig(BaseModel):
     tls_key_path: Optional[FilePath] = None
     tls_key_password: Optional[str] = None
 
-    def __init__(self, data: Optional[dict] = None) -> None:
+    def __init__(
+        self, data: Optional[dict] = None, ignore_missing_certs: bool = False
+    ) -> None:
         """Initialize configuration and perform basic validation."""
         super().__init__()
+        self._ignore_missing_certs = ignore_missing_certs
         if data:
             self.tls_certificate_path = data.get(
                 "tls_certificate_path", self.tls_certificate_path
@@ -196,7 +199,7 @@ class TLSConfig(BaseModel):
 
     def validate_yaml(self, disable_tls: bool = False) -> None:
         """Validate TLS config."""
-        if not disable_tls:
+        if not disable_tls and not self._ignore_missing_certs:
             if not self.tls_certificate_path:
                 raise InvalidConfigurationError(
                     "Can not enable TLS without ols_config.tls_config.tls_certificate_path"
@@ -850,7 +853,9 @@ class OLSConfig(BaseModel):
 
     extra_ca: list[FilePath] = []
 
-    def __init__(self, data: Optional[dict] = None) -> None:
+    def __init__(
+        self, data: Optional[dict] = None, ignore_missing_certs: bool = False
+    ) -> None:
         """Initialize configuration and perform basic validation."""
         super().__init__()
         if data is None:
@@ -867,7 +872,7 @@ class OLSConfig(BaseModel):
         self.authentication_config = AuthenticationConfig(
             **data.get("authentication_config", {})
         )
-        self.tls_config = TLSConfig(data.get("tls_config", None))
+        self.tls_config = TLSConfig(data.get("tls_config", None), ignore_missing_certs)
         if data.get("query_filters", None) is not None:
             self.query_filters = []
             for item in data.get("query_filters", None):
@@ -962,7 +967,10 @@ class Config(BaseModel):
     user_data_collector_config: Optional[UserDataCollectorConfig] = None
 
     def __init__(
-        self, data: Optional[dict] = None, ignore_llm_secrets: bool = False
+        self,
+        data: Optional[dict] = None,
+        ignore_llm_secrets: bool = False,
+        ignore_missing_certs: bool = False,
     ) -> None:
         """Initialize configuration and perform basic validation."""
         super().__init__()
@@ -975,7 +983,7 @@ class Config(BaseModel):
             raise InvalidConfigurationError("no LLM providers config section found")
         v = data.get("ols_config")
         if v is not None:
-            self.ols_config = OLSConfig(v)
+            self.ols_config = OLSConfig(v, ignore_missing_certs)
         else:
             raise InvalidConfigurationError("no OLS config section found")
         # Always initialize dev config, even if there's no config for it.

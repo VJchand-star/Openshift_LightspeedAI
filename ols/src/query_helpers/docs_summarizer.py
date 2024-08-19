@@ -11,7 +11,7 @@ from ols.app.metrics import TokenMetricUpdater
 from ols.app.models.config import ProviderConfig
 from ols.app.models.models import SummarizerResponse
 from ols.constants import RAG_CONTENT_LIMIT, GenericLLMParameters
-from ols.src.prompts.prompt_generator import generate_prompt
+from ols.src.prompts.prompt_generator import GeneratePrompt
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
 
@@ -76,18 +76,10 @@ class DocsSummarizer(QueryHelper):
         bare_llm = self.llm_loader(self.provider, self.model, self.generic_llm_params)
         provider_config = config.llm_config.providers.get(self.provider)
         model_config = provider_config.models.get(self.model)
-        model_options = self._get_model_options(provider_config)
 
-        # Use sample text for context/history to get complete prompt instruction.
-        # This is used to calculate available tokens.
-        temp_prompt, temp_prompt_input = generate_prompt(
-            self.provider,
-            self.model,
-            model_options,
-            query,
-            ["sample"],
-            "sample",
-        )
+        temp_prompt, temp_prompt_input = GeneratePrompt(
+            query, ["sample"], ["ai: sample"]
+        ).generate_prompt(self.model)
         available_tokens = token_handler.calculate_and_check_available_tokens(
             temp_prompt.format(**temp_prompt_input),
             model_config.context_window_size,
@@ -103,21 +95,16 @@ class DocsSummarizer(QueryHelper):
             logger.warning("Proceeding without RAG content. Check start up messages.")
             rag_chunks = []
 
-        rag_context = "\n\n".join([rag_chunk.text for rag_chunk in rag_chunks])
+        rag_context = [rag_chunk.text for rag_chunk in rag_chunks]
 
         # Truncate history, if applicable
         history, truncated = token_handler.limit_conversation_history(
             history, available_tokens
         )
 
-        final_prompt, llm_input_values = generate_prompt(
-            self.provider,
-            self.model,
-            model_options,
-            query,
-            history,
-            rag_context,
-        )
+        final_prompt, llm_input_values = GeneratePrompt(
+            query, rag_context, history
+        ).generate_prompt(self.model)
 
         # Tokens-check: We trigger the computation of the token count
         # without care about the return value. This is to ensure that
@@ -131,7 +118,7 @@ class DocsSummarizer(QueryHelper):
         chat_engine = LLMChain(
             llm=bare_llm,
             prompt=final_prompt,
-            verbose=verbose,
+            verbose=True,
         )
 
         with TokenMetricUpdater(

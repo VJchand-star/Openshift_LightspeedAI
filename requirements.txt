@@ -810,9 +810,9 @@ llama-index-legacy==0.9.48.post3 \
     --hash=sha256:04221320d84d96ba9ee3e21e5055bd8527cbd769e8f1c60cf0368ed907e012a2 \
     --hash=sha256:f6969f1085efb0abebd6367e46f3512020f3f6b9c086f458a519830dd61e8206
     # via llama-index
-llama-index-llms-openai==0.1.26 \
-    --hash=sha256:08a408cd53af4cd4623dd5807be4cbbd5e5b3ca01272128cd678d667343e4d5d \
-    --hash=sha256:1ad8e4eb02f9410c2091749d4d9aa9db4452646b595eb5eb937edbc496fb65fe
+llama-index-llms-openai==0.2.15 \
+    --hash=sha256:a906669397c4c0c3ee55b241dcc22bf0129b3391a8d6ae681a2579affbc5ed48 \
+    --hash=sha256:f13655535e8966f5ccf0214c7360e86ef8fc718678557ef248d7fe13f6fde8d0
     # via
     #   llama-index
     #   llama-index-agent-openai

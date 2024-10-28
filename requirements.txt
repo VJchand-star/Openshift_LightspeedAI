@@ -760,9 +760,9 @@ llama-cloud==0.0.13 \
     --hash=sha256:0e3165a22f8df34a00d13f1f5739438ba4d620f2d8a9289df830078a39fe6f1f \
     --hash=sha256:b641450308b80c85eeae7ef9cb5a3b4a3b1823d5cde05b626ce33f7494ec6229
     # via llama-index-indices-managed-llama-cloud
-llama-index==0.10.55 \
-    --hash=sha256:32781185d60d99dc7a02f2efa73bdaca2f0ae96bf5d42cef6f1b9124f9eacf65 \
-    --hash=sha256:b07e4708e451c4505df978997c998f10ff2ebdbda12fbf892b7e6df79f5cf4c8
+llama-index==0.11.20 \
+    --hash=sha256:5e8e3fcb5af5b4e4525498b075ff0a54160b00bf0fc0b83801fc7faf1c8a8c1d \
+    --hash=sha256:fc9e5e47e6da3610bc3b788d208bb782c03a342fd71e3b22b37abc83ecebe46e
     # via ols (pyproject.toml)
 llama-index-agent-openai==0.2.9 \
     --hash=sha256:d7f0fd4c87124781acd783be603871f8808b1a3969e876a9c96e2ed0844d46ac \
